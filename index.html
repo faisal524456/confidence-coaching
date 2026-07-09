@@ -249,13 +249,89 @@ background:#084298;
 <button type="submit">সংরক্ষণ করুন</button>
 
 </form>
+<h2>শিক্ষার্থীর তালিকা</h2>
 
+<table id="studentTable" border="1" width="100%">
+<tr>
+<th>নাম</th>
+<th>পিতার নাম</th>
+<th>মোবাইল</th>
+<th>ক্লাস</th>
+<th>বেতন</th>
+</tr>
+</table>
 </div>
   <script>
-document.querySelector("form").addEventListener("submit", function(e){
-    e.preventDefault();
-    alert("শিক্ষার্থীর তথ্য সফলভাবে সংরক্ষণ হয়েছে।");
+
+const form=document.querySelector("form");
+const table=document.getElementById("studentTable");
+
+form.addEventListener("submit",function(e){
+
+e.preventDefault();
+
+let inputs=form.querySelectorAll("input,select");
+
+let name=inputs[0].value;
+let father=inputs[1].value;
+let mother=inputs[2].value;
+let mobile=inputs[3].value;
+let address=inputs[4].value;
+let cls=inputs[5].value;
+let fee=inputs[6].value;
+
+let students=JSON.parse(localStorage.getItem("students"))||[];
+
+students.push({
+name,
+father,
+mother,
+mobile,
+address,
+cls,
+fee
 });
+
+localStorage.setItem("students",JSON.stringify(students));
+
+form.reset();
+
+loadStudents();
+
+});
+
+function loadStudents(){
+
+let students=JSON.parse(localStorage.getItem("students"))||[];
+
+table.innerHTML=`
+<tr>
+<th>নাম</th>
+<th>পিতার নাম</th>
+<th>মোবাইল</th>
+<th>ক্লাস</th>
+<th>বেতন</th>
+</tr>
+`;
+
+students.forEach(s=>{
+
+table.innerHTML+=`
+<tr>
+<td>${s.name}</td>
+<td>${s.father}</td>
+<td>${s.mobile}</td>
+<td>${s.cls}</td>
+<td>${s.fee} ৳</td>
+</tr>
+`;
+
+});
+
+}
+
+loadStudents();
+
   </script>
   </body>
 </html>
