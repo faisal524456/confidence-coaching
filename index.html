@@ -316,10 +316,11 @@ table.innerHTML=`
 <th>মোবাইল</th>
 <th>ক্লাস</th>
 <th>বেতন</th>
+<th>অ্যাকশন</th>
 </tr>
 `;
 
-students.forEach(s=>{
+students.forEach((s,index)=>{
 
 table.innerHTML+=`
 <tr>
@@ -328,6 +329,9 @@ table.innerHTML+=`
 <td>${s.mobile}</td>
 <td>${s.cls}</td>
 <td>${s.fee} ৳</td>
+<td>
+<button onclick="deleteStudent(${index})">Delete</button>
+</td>
 </tr>
 `;
 
@@ -359,6 +363,21 @@ rows[i].style.display="none";
 }
 
 }
+    function deleteStudent(index){
+
+let students=JSON.parse(localStorage.getItem("students"))||[];
+
+if(confirm("শিক্ষার্থীকে মুছে ফেলতে চান?")){
+
+students.splice(index,1);
+
+localStorage.setItem("students",JSON.stringify(students));
+
+loadStudents();
+
+}
+
+    }
   </script>
   </body>
 </html>
