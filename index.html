@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confidence Coaching Management System</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+}
+
+header{
+background:#0d6efd;
+color:white;
+padding:20px;
+text-align:center;
+}
+
+nav{
+background:#084298;
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+nav a{
+color:white;
+padding:15px;
+text-decoration:none;
+}
+
+nav a:hover{
+background:#0d6efd;
+}
+
+.container{
+width:95%;
+margin:20px auto;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,.15);
+margin-bottom:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+}
+
+.box{
+background:#0d6efd;
+color:white;
+padding:25px;
+border-radius:10px;
+text-align:center;
+}
+
+.box h2{
+font-size:20px;
+margin-bottom:10px;
+}
+
+.box h1{
+font-size:35px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+table th,table td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+table th{
+background:#0d6efd;
+color:white;
+}
+
+.paid{
+color:green;
+font-weight:bold;
+}
+
+.due{
+color:red;
+font-weight:bold;
+}
+
+footer{
+margin-top:30px;
+background:#0d6efd;
+color:white;
+text-align:center;
+padding:15px;
+}
+
+@media(max-width:700px){
+nav{
+flex-direction:column;
+}
+}
+</style>
+
+</head>
+<body>
+
+<header>
+<h1>Confidence Coaching Management System</h1>
+<p>Student Fee Management</p>
+</header>
+
+<nav>
+<a href="#">Dashboard</a>
+<a href="#">Students</a>
+<a href="#">Fee</a>
+<a href="#">Report</a>
+</nav>
+
+<div class="container">
+
+<div class="grid">
+
+<div class="box">
+<h2>Total Students</h2>
+<h1>0</h1>
+</div>
+
+<div class="box">
+<h2>Total Collection</h2>
+<h1>0 ৳</h1>
+</div>
+
+<div class="box">
+<h2>Total Due</h2>
+<h1>0 ৳</h1>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Recent Students</h2>
+
+<table>
+
+<tr>
+<th>নাম</th>
+<th>ক্লাস</th>
+<th>মোবাইল</th>
+<th>স্ট্যাটাস</th>
+</tr>
+
+<tr>
+<td>ডেমো</td>
+<td>১০ম</td>
+<td>01XXXXXXXXX</td>
+<td class="due">বাকি</td>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+<footer>
+
+© 2026 Confidence Coaching
+
+</footer
