@@ -250,7 +250,12 @@ background:#084298;
 
 </form>
 <h2>শিক্ষার্থীর তালিকা</h2>
-
+<input
+id="search"
+type="text"
+placeholder="শিক্ষার্থীর নাম লিখে খুঁজুন"
+onkeyup="searchStudent()"
+style="width:100%;padding:12px;margin:15px 0;border:1px solid #ccc;border-radius:8px;">
 <table id="studentTable" border="1" width="100%">
 <tr>
 <th>নাম</th>
@@ -331,7 +336,29 @@ table.innerHTML+=`
 }
 
 loadStudents();
+function searchStudent(){
 
+let value=document.getElementById("search").value.toLowerCase();
+
+let rows=document.querySelectorAll("#studentTable tr");
+
+for(let i=1;i<rows.length;i++){
+
+let name=rows[i].cells[0].innerText.toLowerCase();
+
+if(name.indexOf(value)>-1){
+
+rows[i].style.display="";
+
+}else{
+
+rows[i].style.display="none";
+
+}
+
+}
+
+}
   </script>
   </body>
 </html>
