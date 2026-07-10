@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Confidence Coaching Management System</title>
+<title>Confidence Coaching Pro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 <style>
     * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
     body { background:#f5f7fb; }
@@ -13,28 +15,19 @@
     nav a:hover { background:#0d6efd; }
     .container { width:95%; margin:20px auto; }
     .card { background:white; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,.15); margin-bottom:20px; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
-    .box { background:#0d6efd; color:white; padding:25px; border-radius:10px; text-align:center; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
+    .box { background:#0d6efd; color:white; padding:20px; border-radius:10px; text-align:center; }
     table { width:100%; border-collapse:collapse; margin-top:15px; }
     table th, table td { border:1px solid #ddd; padding:10px; text-align:center; }
     table th { background:#0d6efd; color:white; }
-    .paid { color:green; font-weight:bold; }
-    .due { color:red; font-weight:bold; }
-    footer { margin-top:30px; background:#0d6efd; color:white; text-align:center; padding:15px; }
-    form { display:flex; flex-direction:column; gap:12px; margin-top:15px; }
-    input, select { padding:12px; border:1px solid #ccc; border-radius:8px; font-size:16px; }
-    button { padding:12px; background:#0d6efd; color:white; border:none; border-radius:8px; font-size:16px; cursor:pointer; }
-    button:hover { background:#084298; }
+    .btn-group { display:flex; gap:5px; justify-content:center; }
     .section { display: none; }
+    .filter-btn { padding:8px; margin-right:5px; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<header>
-    <h1>Confidence Coaching Management System</h1>
-    <p>Student Fee Management</p>
-</header>
-
+<header><h1>Confidence Coaching Management System</h1></header>
 <nav>
     <a onclick="showSection('dashboardSection')">Dashboard</a>
     <a onclick="showSection('studentsSection')">Students</a>
@@ -48,127 +41,140 @@
             <div class="box"><h2>Total Collection</h2><h1 id="totalCollection">0 ৳</h1></div>
             <div class="box"><h2>Total Due</h2><h1 id="totalDue">0 ৳</h1></div>
         </div>
+        <div class="card" style="margin-top:20px;">
+            <button onclick="downloadPDF()">PDF রিপোর্ট ডাউনলোড</button>
+            <button onclick="exportData()">ডাটা ব্যাকআপ (JSON)</button>
+        </div>
     </div>
 
     <div id="studentsSection" class="section">
         <div class="card">
-            <h2>নতুন শিক্ষার্থী যোগ করুন</h2>
-            <form id="studentForm">
-                <input type="text" placeholder="শিক্ষার্থীর নাম" required>
-                <input type="text" placeholder="পিতার নাম">
-                <input type="text" placeholder="মাতার নাম">
-                <input type="text" placeholder="মোবাইল নম্বর">
-                <input type="text" placeholder="ঠিকানা">
-                <select><option>ক্লাস নির্বাচন করুন</option><option>৬ষ্ঠ</option><option>৭ম</option><option>৮ম</option><option>৯ম</option><option>১০ম</option><option>একাদশ</option><option>দ্বাদশ</option></select>
-                <input type="number" placeholder="মাসিক বেতন">
-                <select id="month"><option value="জানুয়ারি">জানুয়ারি</option><option value="ফেব্রুয়ারি">ফেব্রুয়ারি</option><option value="মার্চ">মার্চ</option><option value="এপ্রিল">এপ্রিল</option><option value="মে">মে</option><option value="জুন">জুন</option><option value="জুলাই">জুলাই</option><option value="আগস্ট">আগস্ট</option><option value="সেপ্টেম্বর">সেপ্টেম্বর</option><option value="অক্টোবর">অক্টোবর</option><option value="নভেম্বর">নভেম্বর</option><option value="ডিসেম্বর">ডিসেম্বর</option></select>
-                <button type="submit">সংরক্ষণ করুন</button>
+            <h2>শিক্ষার্থী যোগ করুন</h2>
+            <form id="studentForm" style="display:flex; flex-direction:column; gap:10px;">
+                <input type="text" id="name" placeholder="নাম" required>
+                <input type="text" id="father" placeholder="পিতার নাম">
+                <input type="text" id="mobile" placeholder="মোবাইল">
+                <input type="text" id="cls" placeholder="ক্লাস">
+                <input type="number" id="fee" placeholder="বেতন">
+                <button type="submit">সংরক্ষণ</button>
             </form>
             <hr style="margin:20px 0;">
-            <h2>শিক্ষার্থীর তালিকা</h2>
-            <input id="search" type="text" placeholder="নাম, ক্লাস, মোবাইল বা অন্য তথ্য লিখে খুঁজুন..." onkeyup="searchStudent()" style="width:100%;padding:12px;margin:15px 0;border:1px solid #ccc;border-radius:8px;">
+            <input type="text" id="search" placeholder="সার্চ করুন..." onkeyup="loadTable()" style="width:100%; padding:10px;">
+            <div style="margin-top:10px;">
+                <button class="filter-btn" onclick="filterTable('All')">সব</button>
+                <button class="filter-btn" onclick="filterTable('Paid')">Paid</button>
+                <button class="filter-btn" onclick="filterTable('Due')">Due</button>
+            </div>
             <table id="studentTable"></table>
         </div>
     </div>
 
     <div id="feeSection" class="section">
         <div class="card">
-            <h2>💰 বেতন সংগ্রহ</h2>
-            <select id="feeStudent" style="width:100%;"><option value="">শিক্ষার্থী নির্বাচন করুন</option></select><br><br>
-            <button onclick="collectFee()" style="width:100%;">বেতন গ্রহণ করুন</button>
+            <h2>💰 বেতন গ্রহণ</h2>
+            <select id="feeStudent" style="width:100%; padding:10px;"></select><br><br>
+            <button onclick="collectFee()" style="width:100%;">পেমেন্ট সম্পন্ন করুন</button>
         </div>
     </div>
 </div>
 
-<footer>© 2026 CONFIDENCE COACHING, PATIYA</footer>
-
 <script>
-let editIndex = -1;
+let currentFilter = 'All';
 const form = document.getElementById("studentForm");
-const table = document.getElementById("studentTable");
-
-window.onload = () => { loadStudents(); updateFeeDropdown(); };
 
 function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     document.getElementById(id).style.display = 'block';
 }
 
-form.addEventListener("submit", function(e) {
-    e.preventDefault();
-    let inputs = form.querySelectorAll("input, select");
+function loadTable() {
     let students = JSON.parse(localStorage.getItem("students")) || [];
-    let data = { name: inputs[0].value, father: inputs[1].value, mother: inputs[2].value, mobile: inputs[3].value, address: inputs[4].value, cls: inputs[5].value, fee: inputs[6].value, month: document.getElementById("month").value, status: editIndex == -1 ? "Due" : students[editIndex].status };
+    let search = document.getElementById("search").value.toLowerCase();
+    let table = document.getElementById("studentTable");
     
-    if (editIndex == -1) students.push(data);
-    else { students[editIndex] = data; editIndex = -1; }
+    table.innerHTML = `<tr><th>নাম</th><th>মোবাইল</th><th>ক্লাস</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr>`;
     
-    localStorage.setItem("students", JSON.stringify(students));
-    form.reset();
-    loadStudents();
-    updateFeeDropdown();
-});
-
-function loadStudents() {
-    let students = JSON.parse(localStorage.getItem("students")) || [];
-    table.innerHTML = `<tr><th>নাম</th><th>পিতার নাম</th><th>মোবাইল</th><th>ক্লাস</th><th>বেতন</th><th>মাস</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr>`;
-    students.forEach((s, index) => {
-        table.innerHTML += `<tr><td>${s.name}</td><td>${s.father}</td><td>${s.mobile}</td><td>${s.cls}</td><td>${s.fee} ৳</td><td>${s.month}</td><td class="${s.status.toLowerCase()}">${s.status}</td><td><button onclick="editStudent(${index})">Edit</button> <button onclick="payFee(${index})">Paid</button> <button onclick="deleteStudent(${index})">Delete</button></td></tr>`;
+    students.forEach((s, i) => {
+        if ((currentFilter === 'All' || s.status === currentFilter) && 
+            (s.name.toLowerCase().includes(search) || s.mobile.includes(search))) {
+            table.innerHTML += `<tr><td>${s.name}</td><td>${s.mobile}</td><td>${s.cls}</td><td>${s.status}</td>
+            <td class="btn-group">
+                <button onclick="viewStudent(${i})">View</button>
+                <button onclick="payFee(${i})">Pay</button>
+                <button onclick="deleteStudent(${i})">Del</button>
+            </td></tr>`;
+        }
     });
+    
     let coll = 0, due = 0;
     students.forEach(s => s.status == "Paid" ? coll += Number(s.fee) : due += Number(s.fee));
     document.getElementById("totalStudents").innerText = students.length;
     document.getElementById("totalCollection").innerText = coll + " ৳";
     document.getElementById("totalDue").innerText = due + " ৳";
-}
-
-function updateFeeDropdown() {
-    let students = JSON.parse(localStorage.getItem("students")) || [];
+    
     let select = document.getElementById("feeStudent");
     select.innerHTML = '<option value="">শিক্ষার্থী নির্বাচন করুন</option>';
-    students.forEach((s, i) => select.innerHTML += `<option value="${i}">${s.name} (${s.mobile})</option>`);
+    students.forEach((s, i) => select.innerHTML += `<option value="${i}">${s.name}</option>`);
 }
 
-function collectFee() {
-    let idx = document.getElementById("feeStudent").value;
-    if (idx === "") return alert("শিক্ষার্থী নির্বাচন করুন!");
-    let s = JSON.parse(localStorage.getItem("students"));
-    s[idx].status = "Paid";
-    localStorage.setItem("students", JSON.stringify(s));
-    loadStudents();
-    alert("বেতন গ্রহণ সফল!");
-}
+function filterTable(filter) { currentFilter = filter; loadTable(); }
 
-function searchStudent() {
-    let val = document.getElementById("search").value.toLowerCase();
-    let rows = table.querySelectorAll("tr");
-    for (let i = 1; i < rows.length; i++) rows[i].style.display = rows[i].innerText.toLowerCase().includes(val) ? "" : "none";
-}
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+    students.push({
+        name: document.getElementById("name").value,
+        father: document.getElementById("father").value,
+        mobile: document.getElementById("mobile").value,
+        cls: document.getElementById("cls").value,
+        fee: document.getElementById("fee").value,
+        status: "Due"
+    });
+    localStorage.setItem("students", JSON.stringify(students));
+    form.reset(); loadTable();
+});
 
-function editStudent(i) {
+function viewStudent(i) {
     let s = JSON.parse(localStorage.getItem("students"))[i];
-    let inputs = form.querySelectorAll("input, select");
-    inputs[0].value = s.name; inputs[1].value = s.father; inputs[2].value = s.mother;
-    inputs[3].value = s.mobile; inputs[4].value = s.address; inputs[5].value = s.cls;
-    inputs[6].value = s.fee; document.getElementById("month").value = s.month;
-    editIndex = i; showSection('studentsSection');
+    alert(`নাম: ${s.name}\nপিতা: ${s.father}\nমোবাইল: ${s.mobile}\nক্লাস: ${s.cls}\nবেতন: ${s.fee}৳\nস্ট্যাটাস: ${s.status}`);
 }
 
 function payFee(i) {
     let s = JSON.parse(localStorage.getItem("students"));
-    s[i].status = s[i].status === "Due" ? "Paid" : "Due";
+    s[i].status = "Paid";
     localStorage.setItem("students", JSON.stringify(s));
-    loadStudents();
+    loadTable();
 }
 
 function deleteStudent(i) {
-    if (confirm("মুছে ফেলতে চান?")) {
-        let s = JSON.parse(localStorage.getItem("students"));
-        s.splice(i, 1);
-        localStorage.setItem("students", JSON.stringify(s));
-        loadStudents(); updateFeeDropdown();
-    }
+    let s = JSON.parse(localStorage.getItem("students"));
+    s.splice(i, 1);
+    localStorage.setItem("students", JSON.stringify(s));
+    loadTable();
 }
+
+function collectFee() {
+    let i = document.getElementById("feeStudent").value;
+    if(i !== "") { payFee(i); alert("পেমেন্ট সফল!"); }
+}
+
+function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Student Fee Report", 10, 10);
+    doc.autoTable({ html: '#studentTable' });
+    doc.save('report.pdf');
+}
+
+function exportData() {
+    let data = localStorage.getItem("students");
+    let blob = new Blob([data], {type: "application/json"});
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url; a.download = "backup.json"; a.click();
+}
+
+window.onload = loadTable;
 </script>
 </body>
 </html>
