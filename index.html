@@ -346,7 +346,7 @@ table.innerHTML+=`
 
 loadStudents();
 function searchStudent(){
-  function editStudent(index){
+function editStudent(index){
 
 let students=JSON.parse(localStorage.getItem("students"))||[];
 
@@ -391,17 +391,21 @@ rows[i].style.display="none";
 }
 
 }
-    function payFee(index){
+ function payFee(index){
 
 let students=JSON.parse(localStorage.getItem("students"))||[];
 
-students[index].status="Paid";
+if(students[index].status=="Due"){
+    students[index].status="Paid";
+}else{
+    students[index].status="Due";
+}
 
 localStorage.setItem("students",JSON.stringify(students));
 
 loadStudents();
 
-    }
+ }
 function deleteStudent(index){
 
 let students=JSON.parse(localStorage.getItem("students"))||[];
