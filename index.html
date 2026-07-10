@@ -2,39 +2,71 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Confidence Coaching PRO</title>
+    <title>Confidence Coaching Pro - Full System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * { box-sizing:border-box; font-family:Arial,sans-serif; }
-        body { background:#f5f7fb; padding:10px; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+        body { background:#f5f7fb; }
+        header { background:#0d6efd; color:white; padding:20px; text-align:center; }
+        nav { background:#084298; display:flex; justify-content:center; flex-wrap:wrap; }
+        nav a { color:white; padding:15px; text-decoration:none; cursor:pointer; }
+        nav a:hover { background:#0d6efd; }
+        .container { width:95%; margin:20px auto; }
         .card { background:white; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,.15); margin-bottom:20px; }
-        input, select { width:100%; padding:10px; margin:5px 0; border:1px solid #ccc; border-radius:5px; }
-        button { padding:10px; cursor:pointer; background:#0d6efd; color:white; border:none; border-radius:5px; margin:2px; }
-        table { width:100%; border-collapse:collapse; margin-top:10px; }
-        th, td { border:1px solid #ddd; padding:8px; text-align:center; }
-        #idCard { width:300px; padding:20px; background:white; border:2px solid #0d6efd; display:none; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
+        .box { background:#0d6efd; color:white; padding:20px; border-radius:10px; text-align:center; }
+        table { width:100%; border-collapse:collapse; margin-top:15px; }
+        th, td { border:1px solid #ddd; padding:10px; text-align:center; }
+        th { background:#0d6efd; color:white; }
+        .filter-btn { padding:8px 12px; margin:5px; cursor:pointer; background:#0d6efd; color:white; border:none; border-radius:5px; }
+        #idCard { width:350px; padding:20px; background:white; border:2px solid #0d6efd; display:none; margin:auto; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>নতুন শিক্ষার্থী যোগ</h2>
-    <form id="studentForm">
-        <input type="text" id="name" placeholder="নাম" required>
-        <input type="text" id="father" placeholder="পিতার নাম">
-        <input type="text" id="mobile" placeholder="মোবাইল">
-        <input type="file" id="imgInput" accept="image/*">
-        <button type="submit">সংরক্ষণ করুন</button>
-    </form>
-</div>
+<header><h1>Confidence Coaching Management System</h1></header>
+<nav>
+    <a onclick="showSection('dashboardSection')">Dashboard</a>
+    <a onclick="showSection('studentsSection')">Students</a>
+    <a onclick="showSection('feeSection')">Fee</a>
+</nav>
 
-<div class="card">
-    <h2>শিক্ষার্থী তালিকা</h2>
-    <table id="studentTable"></table>
+<div class="container">
+    <div id="dashboardSection" class="card">
+        <div class="grid">
+            <div class="box"><h2 id="totalStudents">0</h2><p>Total Students</p></div>
+            <div class="box"><h2 id="totalColl">0 ৳</h2><p>Total Collection</p></div>
+        </div>
+    </div>
+
+    <div id="studentsSection" class="card">
+        <h2>নতুন শিক্ষার্থী ও তথ্য</h2>
+        <form id="studentForm">
+            <input type="text" id="name" placeholder="নাম" required style="padding:10px; width:100%; margin:5px 0;">
+            <input type="text" id="father" placeholder="পিতার নাম" style="padding:10px; width:100%;">
+            <input type="text" id="mobile" placeholder="মোবাইল" style="padding:10px; width:100%;">
+            <input type="file" id="imgInput" accept="image/*" style="padding:10px;">
+            <button type="submit" style="padding:10px; width:100%; background:#0d6efd; color:white; border:none;">সংরক্ষণ করুন</button>
+        </form>
+        <hr style="margin:20px 0;">
+        <input type="text" id="search" placeholder="সার্চ করুন..." onkeyup="renderTable()" style="padding:10px; width:100%;">
+        <div id="filters" style="margin-top:10px;">
+            <button class="filter-btn" onclick="setFilter('All')">সব</button>
+            <button class="filter-btn" onclick="setFilter('Paid')" style="background:#28a745;">Paid</button>
+            <button class="filter-btn" onclick="setFilter('Due')" style="background:#dc3545;">Due</button>
+        </div>
+        <table id="studentTable"></table>
+    </div>
+
+    <div id="feeSection" class="card">
+        <h2>💰 বেতন গ্রহণ</h2>
+        <select id="feeStudent" style="width:100%; padding:10px;"></select>
+        <button onclick="collectFee()" style="width:100%; margin-top:10px; background:#28a745; color:white; border:none; padding:10px;">পেমেন্ট সম্পন্ন</button>
+    </div>
 </div>
 
 <div id="idCard">
-    <h3 id="cardName"></h3>
+    <h2 id="cardName"></h2>
     <img id="cardImg" width="100">
     <p>মোবাইল: <span id="cardMobile"></span></p>
     <div id="cardMonths"></div>
@@ -42,31 +74,41 @@
 
 <script>
 let students = JSON.parse(localStorage.getItem("students")) || [];
+let filter = 'All';
+
+function showSection(id) {
+    document.getElementById('dashboardSection').style.display = (id=='dashboardSection')?'block':'none';
+    document.getElementById('studentsSection').style.display = (id=='studentsSection')?'block':'none';
+    document.getElementById('feeSection').style.display = (id=='feeSection')?'block':'none';
+}
 
 document.getElementById("studentForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    const file = document.getElementById("imgInput").files[0];
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        students.push({
-            name: document.getElementById("name").value,
-            father: document.getElementById("father").value,
-            mobile: document.getElementById("mobile").value,
-            img: event.target.result,
-            fees: { "জানুয়ারি":"Due", "ফেব্রুয়ারি":"Due", "মার্চ":"Due", "এপ্রিল":"Due", "মে":"Due", "জুন":"Due", "জুলাই":"Due", "আগস্ট":"Due", "সেপ্টেম্বর":"Due", "অক্টোবর":"Due", "নভেম্বর":"Due", "ডিসেম্বর":"Due" }
-        });
-        localStorage.setItem("students", JSON.stringify(students));
-        renderTable();
-    };
-    reader.readAsDataURL(file);
+    const fileInput = document.getElementById("imgInput");
+    if(fileInput.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            students.push({
+                name: document.getElementById("name").value,
+                father: document.getElementById("father").value,
+                mobile: document.getElementById("mobile").value,
+                img: event.target.result,
+                fees: { "Jan":"Due", "Feb":"Due", "Mar":"Due", "Apr":"Due", "May":"Due", "Jun":"Due", "Jul":"Due" }
+            });
+            saveAndRender();
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    }
 });
 
 function renderTable() {
-    const table = document.getElementById("studentTable");
+    let table = document.getElementById("studentTable");
+    let search = document.getElementById("search").value.toLowerCase();
     table.innerHTML = `<tr><th>নাম</th><th>অ্যাকশন</th></tr>`;
     students.forEach((s, i) => {
-        table.innerHTML += `<tr><td>${s.name}</td>
-        <td><button onclick="viewStudent(${i})">View/ID Card</button><button onclick="deleteStudent(${i})">Del</button></td></tr>`;
+        if(s.name.toLowerCase().includes(search)) {
+            table.innerHTML += `<tr><td>${s.name}</td><td><button onclick="viewStudent(${i})">View/ID</button><button onclick="deleteStudent(${i})">Del</button></td></tr>`;
+        }
     });
 }
 
@@ -76,32 +118,32 @@ function viewStudent(i) {
     document.getElementById("cardImg").src = s.img;
     document.getElementById("cardMobile").innerText = s.mobile;
     let mDiv = document.getElementById("cardMonths");
-    mDiv.innerHTML = "<h4>মাসিক পেমেন্ট:</h4>";
+    mDiv.innerHTML = "<h4>পেমেন্ট স্ট্যাটাস:</h4>";
     for(let m in s.fees) {
-        mDiv.innerHTML += `<button onclick="toggleFee(${i}, '${m}')" style="background:${s.fees[m]=='Paid'?'green':'red'}">${m}: ${s.fees[m]}</button>`;
+        mDiv.innerHTML += `<button onclick="toggleFee(${i}, '${m}')" style="background:${s.fees[m]=='Paid'?'green':'red'}; border:none; margin:2px; color:white;">${m}: ${s.fees[m]}</button>`;
     }
     document.getElementById("idCard").style.display = "block";
-    
-    // ডাউনলোড অপশন
     setTimeout(() => {
-        html2pdf().from(document.getElementById("idCard")).save(s.name + "_ID_Card.pdf");
+        html2pdf().from(document.getElementById("idCard")).save(s.name + "_ID.pdf");
         document.getElementById("idCard").style.display = "none";
     }, 500);
 }
 
-function toggleFee(i, month) {
-    students[i].fees[month] = students[i].fees[month] == "Paid" ? "Due" : "Paid";
-    localStorage.setItem("students", JSON.stringify(students));
-    viewStudent(i); // আপডেট দেখাতে আবার কল
+function toggleFee(i, m) {
+    students[i].fees[m] = students[i].fees[m] == 'Paid' ? 'Due' : 'Paid';
+    saveAndRender();
+    viewStudent(i);
 }
 
-function deleteStudent(i) {
-    students.splice(i, 1);
+function saveAndRender() {
     localStorage.setItem("students", JSON.stringify(students));
     renderTable();
 }
 
+function deleteStudent(i) { students.splice(i, 1); saveAndRender(); }
+
+showSection('dashboardSection');
 renderTable();
 </script>
 </body>
-    </html>
+</html>
