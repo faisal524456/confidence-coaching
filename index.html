@@ -346,6 +346,7 @@ table.innerHTML+=`
 
 loadStudents();
 function searchStudent(){
+  function editStudent(index){
 
 let students=JSON.parse(localStorage.getItem("students"))||[];
 
@@ -374,23 +375,6 @@ let value=document.getElementById("search").value.toLowerCase();
 let rows=document.querySelectorAll("#studentTable tr");
 
 for(let i=1;i<rows.length;i++){
-  function searchStudent(){
-
-// পুরো searchStudent কোড
-
-}
-
-function editStudent(index){
-
-// পুরো editStudent কোড
-
-}
-
-function deleteStudent(index){
-
-// deleteStudent কোড
-
-}
 
 let name=rows[i].cells[0].innerText.toLowerCase();
 
