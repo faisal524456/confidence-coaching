@@ -49,6 +49,9 @@
             <h2>শিক্ষার্থী যোগ করুন</h2>
             <form id="studentForm" style="display:flex; flex-direction:column; gap:10px;">
                 <input type="text" id="name" placeholder="নাম" required>
+                <input type="text" id="father" placeholder="পিতার নাম" required>
+                <input type="text" id="mobile" placeholder="মোবাইল" required>
+                <input type="text" id="cls" placeholder="ক্লাস" required>
                 <input type="number" id="fee" placeholder="বেতন" required>
                 <button type="submit">সংরক্ষণ করুন</button>
             </form>
@@ -62,7 +65,7 @@
     <h2 id="studentNameDisplay"></h2>
     <input type="number" id="amountInput" placeholder="টাকার পরিমাণ..." style="width:100%; padding:10px; margin:10px 0;">
     <div id="monthGrid"></div>
-    <button onclick="document.getElementById('recordPanel').style.display='none'" style="margin-top:10px; background:#6c757d; color:white; border:none; padding:10px;">বন্ধ করুন</button>
+    <button onclick="document.getElementById('recordPanel').style.display='none'" style="margin-top:10px; padding:10px;">বন্ধ করুন</button>
 </div>
 
 <footer>© 2026 CONFIDENCE COACHING, PATIYA</footer>
@@ -78,26 +81,24 @@ function showSection(id) {
 function loadTable() {
     let table = document.getElementById("studentTable");
     let search = document.getElementById("search").value.toLowerCase();
-    table.innerHTML = `<tr><th>নাম</th><th>অ্যাকশন</th></tr>`;
+    table.innerHTML = `<tr><th>নাম</th><th>পিতার নাম</th><th>মোবাইল</th><th>অ্যাকশন</th></tr>`;
     let totalColl = 0, totalDue = 0;
 
     students.forEach((s, i) => {
         if (s.name.toLowerCase().includes(search)) {
-            table.innerHTML += `<tr><td>${s.name}</td>
+            table.innerHTML += `<tr><td>${s.name}</td><td>${s.father}</td><td>${s.mobile}</td>
             <td>
                 <button onclick="viewRecords(${i})">View Records</button>
                 <button onclick="deleteStudent(${i})">Delete</button>
             </td></tr>`;
         }
-        // হিসাব
+        // হিসাব: যে মাসে পেমেন্ট আছে তা কালেকশনে যোগ হবে, না থাকলে ডিউ
         for(let m in s.monthsData) {
-            if(s.monthsData[m].status === 'Paid') totalColl += Number(s.monthsData[m].amount);
-            else totalDue += Number(s.fee);
+            totalColl += Number(s.monthsData[m].amount);
         }
     });
     document.getElementById("totalStudents").innerText = students.length;
     document.getElementById("totalCollection").innerText = totalColl + " ৳";
-    document.getElementById("totalDue").innerText = totalDue + " ৳";
 }
 
 function viewRecords(index) {
@@ -125,6 +126,8 @@ document.getElementById("studentForm").addEventListener("submit", (e) => {
     e.preventDefault();
     students.push({
         name: document.getElementById("name").value,
+        father: document.getElementById("father").value,
+        mobile: document.getElementById("mobile").value,
         fee: document.getElementById("fee").value,
         monthsData: {}
     });
@@ -133,7 +136,7 @@ document.getElementById("studentForm").addEventListener("submit", (e) => {
 });
 
 function deleteStudent(i) { students.splice(i, 1); localStorage.setItem("students", JSON.stringify(students)); loadTable(); }
-function downloadPDF() { html2pdf().from(document.body).save('Report.pdf'); }
+function downloadPDF() { html2pdf().from(document.body).save('Confidence_Report.pdf'); }
 
 window.onload = loadTable;
 </script>
