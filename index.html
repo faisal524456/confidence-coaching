@@ -294,7 +294,8 @@ mother,
 mobile,
 address,
 cls,
-fee
+fee,
+status:"Due"
 });
 
 localStorage.setItem("students",JSON.stringify(students));
@@ -316,6 +317,7 @@ table.innerHTML=`
 <th>মোবাইল</th>
 <th>ক্লাস</th>
 <th>বেতন</th>
+<th>স্ট্যাটাস</th>
 <th>অ্যাকশন</th>
 </tr>
 `;
@@ -329,8 +331,10 @@ table.innerHTML+=`
 <td>${s.mobile}</td>
 <td>${s.cls}</td>
 <td>${s.fee} ৳</td>
+<td>${s.status}</td>
 <td>
 <button onclick="editStudent(${index})">Edit</button>
+<button onclick="payFee(${index})">Paid</button>
 <button onclick="deleteStudent(${index})">Delete</button>
 </td>
 </tr>
@@ -403,7 +407,18 @@ rows[i].style.display="none";
 }
 
 }
-    function deleteStudent(index){
+    function payFee(index){
+
+let students=JSON.parse(localStorage.getItem("students"))||[];
+
+students[index].status="Paid";
+
+localStorage.setItem("students",JSON.stringify(students));
+
+loadStudents();
+
+    }
+function deleteStudent(index){
 
 let students=JSON.parse(localStorage.getItem("students"))||[];
 
