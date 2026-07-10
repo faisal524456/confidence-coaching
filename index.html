@@ -24,8 +24,8 @@
         .filter-btn { padding: 8px 15px; margin-right: 8px; cursor: pointer; background: #0d6efd; color: white; border: none; border-radius: 5px; }
         
         /* রেকর্ড প্যানেল স্টাইল */
-        .record-modal { display:none; position:fixed; top:10%; left:10%; width:80%; max-height:80%; overflow-y:auto; background:white; padding:20px; border:2px solid #0d6efd; z-index:1000; border-radius:10px; }
-        .month-btn { padding:10px; margin:5px; border:none; cursor:pointer; color:white; border-radius:5px; width:45%; }
+        .record-modal { display:none; position:fixed; top:5%; left:10%; width:80%; max-height:90%; overflow-y:auto; background:white; padding:20px; border:2px solid #0d6efd; z-index:1000; border-radius:10px; }
+        .month-btn { padding:10px; margin:5px; border:none; cursor:pointer; color:white; border-radius:5px; width:45%; display:block; }
     </style>
 </head>
 <body>
@@ -44,9 +44,6 @@
             <div class="box"><h2>Total Collection</h2><h1 id="totalCollection">0 ৳</h1></div>
             <div class="box"><h2>Total Due</h2><h1 id="totalDue">0 ৳</h1></div>
         </div>
-        <div class="card" style="margin-top:20px;">
-            <button onclick="downloadPDF()" style="padding:10px; background:#28a745; color:white; border:none;">PDF রিপোর্ট ডাউনলোড</button>
-        </div>
     </div>
 
     <div id="studentsSection" class="section">
@@ -57,16 +54,10 @@
                 <input type="text" id="father" placeholder="পিতার নাম">
                 <input type="text" id="mobile" placeholder="মোবাইল">
                 <input type="text" id="cls" placeholder="ক্লাস">
-                <input type="number" id="fee" placeholder="বেতন">
                 <button type="submit" style="background:#0d6efd; color:white; border:none; padding:10px;">সংরক্ষণ করুন</button>
             </form>
             <hr style="margin:20px 0;">
             <input type="text" id="search" placeholder="সার্চ করুন..." onkeyup="loadTable()" style="width:100%; padding:10px;">
-            <div style="margin-top:10px;">
-                <button class="filter-btn" onclick="filterTable('All')">সব</button>
-                <button class="filter-btn" onclick="filterTable('Paid')" style="background:#28a745;">Paid</button>
-                <button class="filter-btn" onclick="filterTable('Due')" style="background:#dc3545;">Due</button>
-            </div>
             <table id="studentTable"></table>
         </div>
     </div>
@@ -82,12 +73,12 @@
 
 <div id="recordPanel" class="record-modal">
     <h2 id="studentNameDisplay"></h2>
+    <input type="number" id="amountInput" placeholder="টাকার পরিমাণ লিখুন..." style="width:100%; padding:10px; margin:10px 0;">
     <div id="monthGrid"></div>
     <button onclick="document.getElementById('recordPanel').style.display='none'" style="margin-top:15px; padding:10px; background:#6c757d; color:white; border:none;">বন্ধ করুন</button>
 </div>
 
 <script>
-let currentFilter = 'All';
 let currentStudentIndex = -1;
 const form = document.getElementById("studentForm");
 
@@ -100,28 +91,15 @@ function loadTable() {
     let students = JSON.parse(localStorage.getItem("students")) || [];
     let search = document.getElementById("search").value.toLowerCase();
     let table = document.getElementById("studentTable");
-    
-    table.innerHTML = `<tr><th>নাম</th><th>মোবাইল</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr>`;
-    
+    table.innerHTML = `<tr><th>নাম</th><th>অ্যাকশন</th></tr>`;
     students.forEach((s, i) => {
-        if ((currentFilter === 'All' || s.status === currentFilter) && (s.name.toLowerCase().includes(search))) {
-            table.innerHTML += `<tr><td>${s.name}</td><td>${s.mobile}</td><td>${s.status}</td>
-            <td class="btn-group">
-                <button onclick="viewRecords(${i})">View Records</button>
-                <button onclick="deleteStudent(${i})">Del</button>
-            </td></tr>`;
+        if (s.name.toLowerCase().includes(search)) {
+            table.innerHTML += `<tr><td>${s.name}</td>
+            <td><button onclick="viewRecords(${i})">View Records</button></td></tr>`;
         }
     });
-    
-    let coll = 0, due = 0;
-    students.forEach(s => s.status == "Paid" ? coll += Number(s.fee) : due += Number(s.fee));
+    // ড্যাশবোর্ড আপডেট
     document.getElementById("totalStudents").innerText = students.length;
-    document.getElementById("totalCollection").innerText = coll + " ৳";
-    document.getElementById("totalDue").innerText = due + " ৳";
-    
-    let select = document.getElementById("feeStudent");
-    select.innerHTML = '<option value="">শিক্ষার্থী নির্বাচন করুন</option>';
-    students.forEach((s, i) => select.innerHTML += `<option value="${i}">${s.name}</option>`);
 }
 
 function viewRecords(index) {
@@ -134,23 +112,25 @@ function viewRecords(index) {
     let months = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
     
     months.forEach(m => {
-        let status = s.monthsData ? (s.monthsData[m] || "Due") : "Due";
-        let color = status === "Paid" ? "green" : "red";
-        grid.innerHTML += `<button class="month-btn" style="background:${color}" onclick="toggleMonth('${m}')">${m}: ${status}</button>`;
+        let data = (s.monthsData && s.monthsData[m]) ? s.monthsData[m] : {status: "Due", amount: 0};
+        let color = data.status === "Paid" ? "green" : "red";
+        grid.innerHTML += `<button class="month-btn" style="background:${color}" onclick="setPayment('${m}')">${m} (${data.amount} ৳) - ${data.status}</button>`;
     });
     document.getElementById("recordPanel").style.display = "block";
 }
 
-function toggleMonth(month) {
+function setPayment(month) {
+    let amount = document.getElementById("amountInput").value;
+    if(!amount) { alert("দয়া করে টাকার পরিমাণ লিখুন!"); return; }
+    
     let students = JSON.parse(localStorage.getItem("students"));
     if(!students[currentStudentIndex].monthsData) students[currentStudentIndex].monthsData = {};
-    let currentStatus = students[currentStudentIndex].monthsData[month] || "Due";
-    students[currentStudentIndex].monthsData[month] = (currentStatus === "Paid" ? "Due" : "Paid");
+    
+    students[currentStudentIndex].monthsData[month] = { status: "Paid", amount: amount };
     localStorage.setItem("students", JSON.stringify(students));
+    document.getElementById("amountInput").value = "";
     viewRecords(currentStudentIndex);
 }
-
-function filterTable(filter) { currentFilter = filter; loadTable(); }
 
 form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -159,38 +139,11 @@ form.addEventListener("submit", (e) => {
         name: document.getElementById("name").value,
         father: document.getElementById("father").value,
         mobile: document.getElementById("mobile").value,
-        cls: document.getElementById("cls").value,
-        fee: document.getElementById("fee").value,
-        status: "Due",
         monthsData: {}
     });
     localStorage.setItem("students", JSON.stringify(students));
     form.reset(); loadTable();
 });
-
-function deleteStudent(i) {
-    if(confirm("মুছে ফেলতে চান?")) {
-        let s = JSON.parse(localStorage.getItem("students"));
-        s.splice(i, 1);
-        localStorage.setItem("students", JSON.stringify(s));
-        loadTable();
-    }
-}
-
-function collectFee() {
-    let i = document.getElementById("feeStudent").value;
-    if(i !== "") { 
-        let s = JSON.parse(localStorage.getItem("students"));
-        s[i].status = "Paid";
-        localStorage.setItem("students", JSON.stringify(s));
-        loadTable(); alert("পেমেন্ট সফল!"); 
-    }
-}
-
-function downloadPDF() {
-    const element = document.getElementById('studentTable');
-    html2pdf().from(element).save('Student_Report.pdf');
-}
 
 window.onload = loadTable;
 </script>
