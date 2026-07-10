@@ -399,27 +399,22 @@ document.getElementById("totalDue").innerText=totalDue+" ৳";
 loadStudents();
 function searchStudent(){
 
-let value=document.getElementById("search").value.toLowerCase();
+    let value = document.getElementById("search").value.toLowerCase();
 
-let rows=document.querySelectorAll("#studentTable tr");
+    let rows = document.querySelectorAll("#studentTable tr");
 
-for(let i=1;i<rows.length;i++){
+    for(let i=1; i<rows.length; i++){
 
-let name=rows[i].cells[0].innerText.toLowerCase();
+        let rowText = rows[i].innerText.toLowerCase();
 
-if(name.indexOf(value)>-1){
+        if(rowText.includes(value)){
+            rows[i].style.display = "";
+        }else{
+            rows[i].style.display = "none";
+        }
 
-rows[i].style.display="";
-
-}else{
-
-rows[i].style.display="none";
-
-}
-
-}
-
-  }
+    }
+                 }
 
 let value=document.getElementById("search").value.toLowerCase();
 
