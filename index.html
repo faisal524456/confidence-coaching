@@ -2,7 +2,6 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confidence Coaching Management System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -11,21 +10,14 @@
         header { background:#0d6efd; color:white; padding:20px; text-align:center; }
         nav { background:#084298; display:flex; justify-content:center; flex-wrap:wrap; }
         nav a { color:white; padding:15px; text-decoration:none; cursor:pointer; }
-        nav a:hover { background:#0d6efd; }
         .container { width:95%; margin:20px auto; }
         .card { background:white; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,.15); margin-bottom:20px; }
-        .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
-        .box { background:#0d6efd; color:white; padding:20px; border-radius:10px; text-align:center; }
         table { width:100%; border-collapse:collapse; margin-top:15px; }
         table th, table td { border:1px solid #ddd; padding:10px; text-align:center; }
         table th { background:#0d6efd; color:white; }
-        .btn-group { display:flex; gap:5px; justify-content:center; }
-        .section { display: none; }
-        .filter-btn { padding: 8px 15px; margin-right: 8px; cursor: pointer; background: #0d6efd; color: white; border: none; border-radius: 5px; }
-        
-        /* রেকর্ড প্যানেল স্টাইল */
+        footer { margin-top:30px; background:#0d6efd; color:white; text-align:center; padding:15px; }
         .record-modal { display:none; position:fixed; top:5%; left:10%; width:80%; max-height:90%; overflow-y:auto; background:white; padding:20px; border:2px solid #0d6efd; z-index:1000; border-radius:10px; }
-        .month-btn { padding:10px; margin:5px; border:none; cursor:pointer; color:white; border-radius:5px; width:45%; display:block; }
+        .month-btn { padding:10px; margin:5px; border:none; cursor:pointer; color:white; border-radius:5px; width:45%; display:inline-block; }
     </style>
 </head>
 <body>
@@ -34,116 +26,64 @@
 <nav>
     <a onclick="showSection('dashboardSection')">Dashboard</a>
     <a onclick="showSection('studentsSection')">Students</a>
-    <a onclick="showSection('feeSection')">Fee</a>
 </nav>
 
 <div class="container">
-    <div id="dashboardSection" class="section" style="display:block;">
-        <div class="grid">
-            <div class="box"><h2>Total Students</h2><h1 id="totalStudents">0</h1></div>
-            <div class="box"><h2>Total Collection</h2><h1 id="totalCollection">0 ৳</h1></div>
-            <div class="box"><h2>Total Due</h2><h1 id="totalDue">0 ৳</h1></div>
-        </div>
-    </div>
-
-    <div id="studentsSection" class="section">
-        <div class="card">
-            <h2>শিক্ষার্থী যোগ করুন</h2>
-            <form id="studentForm" style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
-                <input type="text" id="name" placeholder="নাম" required>
-                <input type="text" id="father" placeholder="পিতার নাম">
-                <input type="text" id="mobile" placeholder="মোবাইল">
-                <input type="text" id="cls" placeholder="ক্লাস">
-                <button type="submit" style="background:#0d6efd; color:white; border:none; padding:10px;">সংরক্ষণ করুন</button>
-            </form>
-            <hr style="margin:20px 0;">
-            <input type="text" id="search" placeholder="সার্চ করুন..." onkeyup="loadTable()" style="width:100%; padding:10px;">
-            <table id="studentTable"></table>
-        </div>
-    </div>
-
-    <div id="feeSection" class="section">
-        <div class="card">
-            <h2>💰 বেতন গ্রহণ</h2>
-            <select id="feeStudent" style="width:100%; padding:10px;"></select><br><br>
-            <button onclick="collectFee()" style="width:100%; padding:10px; background:#28a745; color:white; border:none;">পেমেন্ট সম্পন্ন করুন</button>
-        </div>
+    <div id="studentsSection" class="card">
+        <h2>শিক্ষার্থী তালিকা</h2>
+        <button onclick="downloadPDF()">PDF রিপোর্ট ডাউনলোড</button>
+        <table id="studentTable"></table>
     </div>
 </div>
 
 <div id="recordPanel" class="record-modal">
     <h2 id="studentNameDisplay"></h2>
-    <input type="number" id="amountInput" placeholder="টাকার পরিমাণ লিখুন..." style="width:100%; padding:10px; margin:10px 0;">
+    <input type="number" id="amountInput" placeholder="টাকার পরিমাণ..." style="width:100%; padding:10px; margin:10px 0;">
     <div id="monthGrid"></div>
-    <button onclick="document.getElementById('recordPanel').style.display='none'" style="margin-top:15px; padding:10px; background:#6c757d; color:white; border:none;">বন্ধ করুন</button>
+    <button onclick="document.getElementById('recordPanel').style.display='none'">বন্ধ করুন</button>
 </div>
 
-<script>
-let currentStudentIndex = -1;
-const form = document.getElementById("studentForm");
+<footer>© 2026 CONFIDENCE COACHING, PATIYA</footer>
 
-function showSection(id) {
-    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-}
+<script>
+let students = JSON.parse(localStorage.getItem("students")) || [];
 
 function loadTable() {
-    let students = JSON.parse(localStorage.getItem("students")) || [];
-    let search = document.getElementById("search").value.toLowerCase();
     let table = document.getElementById("studentTable");
     table.innerHTML = `<tr><th>নাম</th><th>অ্যাকশন</th></tr>`;
     students.forEach((s, i) => {
-        if (s.name.toLowerCase().includes(search)) {
-            table.innerHTML += `<tr><td>${s.name}</td>
-            <td><button onclick="viewRecords(${i})">View Records</button></td></tr>`;
-        }
+        table.innerHTML += `<tr><td>${s.name}</td>
+        <td>
+            <button onclick="editStudent(${i})">Edit</button>
+            <button onclick="deleteStudent(${i})">Delete</button>
+            <button onclick="viewRecords(${i})">View Records</button>
+        </td></tr>`;
     });
-    // ড্যাশবোর্ড আপডেট
-    document.getElementById("totalStudents").innerText = students.length;
 }
 
 function viewRecords(index) {
-    currentStudentIndex = index;
-    let students = JSON.parse(localStorage.getItem("students"));
     let s = students[index];
     document.getElementById("studentNameDisplay").innerText = "রেকর্ড: " + s.name;
     let grid = document.getElementById("monthGrid");
     grid.innerHTML = "";
-    let months = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
-    
-    months.forEach(m => {
+    ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"].forEach(m => {
         let data = (s.monthsData && s.monthsData[m]) ? s.monthsData[m] : {status: "Due", amount: 0};
-        let color = data.status === "Paid" ? "green" : "red";
-        grid.innerHTML += `<button class="month-btn" style="background:${color}" onclick="setPayment('${m}')">${m} (${data.amount} ৳) - ${data.status}</button>`;
+        grid.innerHTML += `<button class="month-btn" style="background:${data.status=='Paid'?'green':'red'}" onclick="setPayment('${m}', ${index})">${m} (${data.amount}৳)</button>`;
     });
     document.getElementById("recordPanel").style.display = "block";
 }
 
-function setPayment(month) {
+function setPayment(month, index) {
     let amount = document.getElementById("amountInput").value;
-    if(!amount) { alert("দয়া করে টাকার পরিমাণ লিখুন!"); return; }
-    
-    let students = JSON.parse(localStorage.getItem("students"));
-    if(!students[currentStudentIndex].monthsData) students[currentStudentIndex].monthsData = {};
-    
-    students[currentStudentIndex].monthsData[month] = { status: "Paid", amount: amount };
+    if(!amount) { alert("টাকা লিখুন!"); return; }
+    if(!students[index].monthsData) students[index].monthsData = {};
+    students[index].monthsData[month] = { status: "Paid", amount: amount };
     localStorage.setItem("students", JSON.stringify(students));
-    document.getElementById("amountInput").value = "";
-    viewRecords(currentStudentIndex);
+    viewRecords(index);
 }
 
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    let students = JSON.parse(localStorage.getItem("students")) || [];
-    students.push({
-        name: document.getElementById("name").value,
-        father: document.getElementById("father").value,
-        mobile: document.getElementById("mobile").value,
-        monthsData: {}
-    });
-    localStorage.setItem("students", JSON.stringify(students));
-    form.reset(); loadTable();
-});
+function deleteStudent(i) { students.splice(i, 1); localStorage.setItem("students", JSON.stringify(students)); loadTable(); }
+function downloadPDF() { html2pdf().from(document.getElementById('studentTable')).save(); }
 
 window.onload = loadTable;
 </script>
