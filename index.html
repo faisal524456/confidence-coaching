@@ -282,189 +282,117 @@ style="width:100%;padding:12px;margin:15px 0;border:1px solid #ccc;border-radius
 </div>
   <script>
 let editIndex = -1;
-const form=document.querySelector("form");
-const table=document.getElementById("studentTable");
+const form = document.querySelector("form");
+const table = document.getElementById("studentTable");
 
-form.addEventListener("submit",function(e){
+// পেজ লোড হলে শিক্ষার্থী তালিকা ও ড্রপডাউন আপডেট করা
+window.onload = () => {
+    loadStudents();
+    updateFeeDropdown();
+};
 
-e.preventDefault();
+form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    let inputs = form.querySelectorAll("input, select");
+    let name = inputs[0].value;
+    let father = inputs[1].value;
+    let mother = inputs[2].value;
+    let mobile = inputs[3].value;
+    let address = inputs[4].value;
+    let cls = inputs[5].value;
+    let fee = inputs[6].value;
+    let month = document.getElementById("month").value;
 
-let inputs=form.querySelectorAll("input,select");
+    let students = JSON.parse(localStorage.getItem("students")) || [];
 
-let name=inputs[0].value;
-let father=inputs[1].value;
-let mother=inputs[2].value;
-let mobile=inputs[3].value;
-let address=inputs[4].value;
-let cls=inputs[5].value;
-let fee=inputs[6].value;
-let month=document.getElementById("month").value;
-let students=JSON.parse(localStorage.getItem("students"))||[];
-if(editIndex==-1){
-
-students.push({
-name,
-father,
-mother,
-mobile,
-address,
-cls,
-fee,
-month,
-status:"Due"
+    if (editIndex == -1) {
+        students.push({ name, father, mother, mobile, address, cls, fee, month, status: "Due" });
+    } else {
+        students[editIndex] = { name, father, mother, mobile, address, cls, fee, month, status: students[editIndex].status };
+        editIndex = -1;
+    }
+    
+    localStorage.setItem("students", JSON.stringify(students));
+    form.reset();
+    loadStudents();
+    updateFeeDropdown();
 });
 
-}else{
+function loadStudents() {
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+    table.innerHTML = `<tr><th>নাম</th><th>পিতার নাম</th><th>মোবাইল</th><th>ক্লাস</th><th>বেতন</th><th>মাস</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr>`;
 
-students[editIndex].name=name;
-students[editIndex].father=father;
-students[editIndex].mother=mother;
-students[editIndex].mobile=mobile;
-students[editIndex].address=address;
-students[editIndex].cls=cls;
-students[editIndex].fee=fee;
+    students.forEach((s, index) => {
+        table.innerHTML += `<tr><td>${s.name}</td><td>${s.father}</td><td>${s.mobile}</td><td>${s.cls}</td><td>${s.fee} ৳</td><td>${s.month}</td><td class="${s.status.toLowerCase()}">${s.status}</td><td><button onclick="editStudent(${index})">Edit</button> <button onclick="payFee(${index})">Paid</button> <button onclick="deleteStudent(${index})">Delete</button></td></tr>`;
+    });
 
-editIndex=-1;
-
-}
-localStorage.setItem("students",JSON.stringify(students));
-
-form.reset();
-
-loadStudents();
-
-});
-
-function loadStudents(){
-
-let students=JSON.parse(localStorage.getItem("students"))||[];
-
-table.innerHTML=`
-<tr>
-<th>নাম</th>
-<th>পিতার নাম</th>
-<th>মোবাইল</th>
-<th>ক্লাস</th>
-<th>বেতন</th>
-<th>মাস</th>
-<th>স্ট্যাটাস</th>
-<th>অ্যাকশন</th>
-</tr>
-`;
-
-students.forEach((s,index)=>{
-
-table.innerHTML+=`
-<tr>
-<td>${s.name}</td>
-<td>${s.father}</td>
-<td>${s.mobile}</td>
-<td>${s.cls}</td>
-<td>${s.fee} ৳</td>
-<td>${s.month || "-"}</td>
-<td>${s.status || "Due"}</td>
-<td>
-<button onclick="editStudent(${index})">Edit</button>
-<button onclick="payFee(${index})">Paid</button>
-<button onclick="deleteStudent(${index})">Delete</button>
-</td>
-</tr>
-`;
-
-});
-  let totalCollection=0;
-let totalDue=0;
-
-students.forEach(s=>{
-
-if(s.status=="Paid"){
-totalCollection+=Number(s.fee);
-
-}else{
-
-totalDue+=Number(s.fee);
-
+    let totalCollection = 0;
+    let totalDue = 0;
+    students.forEach(s => {
+        if (s.status == "Paid") totalCollection += Number(s.fee);
+        else totalDue += Number(s.fee);
+    });
+    document.getElementById("totalStudents").innerText = students.length;
+    document.getElementById("totalCollection").innerText = totalCollection + " ৳";
+    document.getElementById("totalDue").innerText = totalDue + " ৳";
 }
 
-});
-
-document.getElementById("totalStudents").innerText=students.length;
-
-document.getElementById("totalCollection").innerText=totalCollection+" ৳";
-
-document.getElementById("totalDue").innerText=totalDue+" ৳";
-
+// ড্রপডাউনে শিক্ষার্থী লোড করা
+function updateFeeDropdown() {
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+    let select = document.getElementById("feeStudent");
+    select.innerHTML = '<option value="">শিক্ষার্থী নির্বাচন করুন</option>';
+    students.forEach((s, index) => {
+        select.innerHTML += `<option value="${index}">${s.name}</option>`;
+    });
 }
 
-loadStudents();
-function searchStudent(){
+// বেতন গ্রহণ ফাংশন
+function collectFee() {
+    let index = document.getElementById("feeStudent").value;
+    if (index === "") { alert("শিক্ষার্থী নির্বাচন করুন!"); return; }
+    let students = JSON.parse(localStorage.getItem("students"));
+    students[index].status = "Paid";
+    localStorage.setItem("students", JSON.stringify(students));
+    loadStudents();
+    alert("বেতন গ্রহণ সফল হয়েছে!");
+}
 
+// সার্চ ফাংশন (ক্র্যাশ মুক্ত)
+function searchStudent() {
     let value = document.getElementById("search").value.toLowerCase();
-
     let rows = document.querySelectorAll("#studentTable tr");
-
-    for(let i=1; i<rows.length; i++){
-
-        let rowText = rows[i].innerText.toLowerCase();
-
-        if(rowText.includes(value)){
-            rows[i].style.display = "";
-        }else{
-            rows[i].style.display = "none";
-        }
-
+    for (let i = 1; i < rows.length; i++) {
+        let name = rows[i].cells[0].innerText.toLowerCase();
+        rows[i].style.display = name.includes(value) ? "" : "none";
     }
-                 }
-
-  function editStudent(index){
-
-let students=JSON.parse(localStorage.getItem("students"))||[];
-
-let s=students[index];
-
-let inputs=form.querySelectorAll("input,select");
-
-inputs[0].value=s.name;
-inputs[1].value=s.father;
-inputs[2].value=s.mother;
-inputs[3].value=s.mobile;
-inputs[4].value=s.address;
-inputs[5].value=s.cls;
-inputs[6].value=s.fee;
-
-editIndex=index;
-
-  }
- function payFee(index){
-
-let students=JSON.parse(localStorage.getItem("students"))||[];
-
-if(students[index].status=="Due"){
-    students[index].status="Paid";
-}else{
-    students[index].status="Due";
 }
 
-localStorage.setItem("students",JSON.stringify(students));
-
-loadStudents();
-
- }
-function deleteStudent(index){
-
-let students=JSON.parse(localStorage.getItem("students"))||[];
-
-if(confirm("শিক্ষার্থীকে মুছে ফেলতে চান?")){
-
-students.splice(index,1);
-
-localStorage.setItem("students",JSON.stringify(students));
-
-loadStudents();
-
+function editStudent(index) {
+    let s = JSON.parse(localStorage.getItem("students"))[index];
+    let inputs = form.querySelectorAll("input, select");
+    inputs[0].value = s.name; inputs[1].value = s.father; inputs[2].value = s.mother;
+    inputs[3].value = s.mobile; inputs[4].value = s.address; inputs[5].value = s.cls;
+    inputs[6].value = s.fee; document.getElementById("month").value = s.month;
+    editIndex = index;
 }
 
+function payFee(index) {
+    let students = JSON.parse(localStorage.getItem("students"));
+    students[index].status = students[index].status === "Due" ? "Paid" : "Due";
+    localStorage.setItem("students", JSON.stringify(students));
+    loadStudents();
+}
+
+function deleteStudent(index) {
+    if (confirm("মুছে ফেলতে চান?")) {
+        let students = JSON.parse(localStorage.getItem("students"));
+        students.splice(index, 1);
+        localStorage.setItem("students", JSON.stringify(students));
+        loadStudents();
+        updateFeeDropdown();
     }
+}
   </script>
   <footer>
 
