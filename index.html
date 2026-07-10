@@ -341,7 +341,7 @@ address,
 cls,
 fee,
 month,
-status:"Due"
+status:"Due"ড়
 });
 
 }else{
@@ -391,8 +391,8 @@ table.innerHTML+=`
 <td>${s.mobile}</td>
 <td>${s.cls}</td>
 <td>${s.fee} ৳</td>
-<td>${s.month}</td>
-<td>${s.status}</td>
+<td>${s.month || "-"}</td>
+<td>${s.status || "Due"}</td>
 <td>
 <button onclick="editStudent(${index})">Edit</button>
 <button onclick="payFee(${index})">Paid</button>
