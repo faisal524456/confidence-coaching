@@ -285,7 +285,7 @@ let address=inputs[4].value;
 let cls=inputs[5].value;
 let fee=inputs[6].value;
 
-let students=JSON.parse(localStora
+let students=JSON.parse(localStorage.getItem("students"))||[];
 if(editIndex==-1){
 
 students.push({
