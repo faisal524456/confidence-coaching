@@ -4,313 +4,104 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Confidence Coaching Management System</title>
-
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-background:#f5f7fb;
-}
-
-header{
-background:#0d6efd;
-color:white;
-padding:20px;
-text-align:center;
-}
-
-nav{
-background:#084298;
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-}
-
-nav a{
-color:white;
-padding:15px;
-text-decoration:none;
-}
-
-nav a:hover{
-background:#0d6efd;
-}
-
-.container{
-width:95%;
-margin:20px auto;
-}
-
-.card{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 3px 10px rgba(0,0,0,.15);
-margin-bottom:20px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:20px;
-}
-
-.box{
-background:#0d6efd;
-color:white;
-padding:25px;
-border-radius:10px;
-text-align:center;
-}
-
-.box h2{
-font-size:20px;
-margin-bottom:10px;
-}
-
-.box h1{
-font-size:35px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:15px;
-}
-
-table th,table td{
-border:1px solid #ddd;
-padding:10px;
-text-align:center;
-}
-
-table th{
-background:#0d6efd;
-color:white;
-}
-
-.paid{
-color:green;
-font-weight:bold;
-}
-
-.due{
-color:red;
-font-weight:bold;
-}
-
-footer{
-margin-top:30px;
-background:#0d6efd;
-color:white;
-text-align:center;
-padding:15px;
-}
-
-@media(max-width:700px){
-nav{
-flex-direction:column;
-}
-}
-  form{
-display:flex;
-flex-direction:column;
-gap:12px;
-margin-top:15px;
-}
-
-input,select{
-padding:12px;
-border:1px solid #ccc;
-border-radius:8px;
-font-size:16px;
-}
-
-button{
-padding:12px;
-background:#0d6efd;
-color:white;
-border:none;
-border-radius:8px;
-font-size:16px;
-cursor:pointer;
-}
-
-button:hover{
-background:#084298;
-}
+    * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+    body { background:#f5f7fb; }
+    header { background:#0d6efd; color:white; padding:20px; text-align:center; }
+    nav { background:#084298; display:flex; justify-content:center; flex-wrap:wrap; }
+    nav a { color:white; padding:15px; text-decoration:none; cursor:pointer; }
+    nav a:hover { background:#0d6efd; }
+    .container { width:95%; margin:20px auto; }
+    .card { background:white; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,.15); margin-bottom:20px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+    .box { background:#0d6efd; color:white; padding:25px; border-radius:10px; text-align:center; }
+    table { width:100%; border-collapse:collapse; margin-top:15px; }
+    table th, table td { border:1px solid #ddd; padding:10px; text-align:center; }
+    table th { background:#0d6efd; color:white; }
+    .paid { color:green; font-weight:bold; }
+    .due { color:red; font-weight:bold; }
+    footer { margin-top:30px; background:#0d6efd; color:white; text-align:center; padding:15px; }
+    form { display:flex; flex-direction:column; gap:12px; margin-top:15px; }
+    input, select { padding:12px; border:1px solid #ccc; border-radius:8px; font-size:16px; }
+    button { padding:12px; background:#0d6efd; color:white; border:none; border-radius:8px; font-size:16px; cursor:pointer; }
+    button:hover { background:#084298; }
+    .section { display: none; }
 </style>
-
 </head>
 <body>
 
 <header>
-<h1>Confidence Coaching Management System</h1>
-<p>Student Fee Management</p>
+    <h1>Confidence Coaching Management System</h1>
+    <p>Student Fee Management</p>
 </header>
 
 <nav>
-<a href="#">Dashboard</a>
-<a href="#">Students</a>
-<a href="#">Fee</a>
-<a href="#">Report</a>
+    <a onclick="showSection('dashboardSection')">Dashboard</a>
+    <a onclick="showSection('studentsSection')">Students</a>
+    <a onclick="showSection('feeSection')">Fee</a>
 </nav>
 
 <div class="container">
+    <div id="dashboardSection" class="section" style="display:block;">
+        <div class="grid">
+            <div class="box"><h2>Total Students</h2><h1 id="totalStudents">0</h1></div>
+            <div class="box"><h2>Total Collection</h2><h1 id="totalCollection">0 ৳</h1></div>
+            <div class="box"><h2>Total Due</h2><h1 id="totalDue">0 ৳</h1></div>
+        </div>
+    </div>
 
-<div class="grid">
+    <div id="studentsSection" class="section">
+        <div class="card">
+            <h2>নতুন শিক্ষার্থী যোগ করুন</h2>
+            <form id="studentForm">
+                <input type="text" placeholder="শিক্ষার্থীর নাম" required>
+                <input type="text" placeholder="পিতার নাম">
+                <input type="text" placeholder="মাতার নাম">
+                <input type="text" placeholder="মোবাইল নম্বর">
+                <input type="text" placeholder="ঠিকানা">
+                <select><option>ক্লাস নির্বাচন করুন</option><option>৬ষ্ঠ</option><option>৭ম</option><option>৮ম</option><option>৯ম</option><option>১০ম</option><option>একাদশ</option><option>দ্বাদশ</option></select>
+                <input type="number" placeholder="মাসিক বেতন">
+                <select id="month"><option value="জানুয়ারি">জানুয়ারি</option><option value="ফেব্রুয়ারি">ফেব্রুয়ারি</option><option value="মার্চ">মার্চ</option><option value="এপ্রিল">এপ্রিল</option><option value="মে">মে</option><option value="জুন">জুন</option><option value="জুলাই">জুলাই</option><option value="আগস্ট">আগস্ট</option><option value="সেপ্টেম্বর">সেপ্টেম্বর</option><option value="অক্টোবর">অক্টোবর</option><option value="নভেম্বর">নভেম্বর</option><option value="ডিসেম্বর">ডিসেম্বর</option></select>
+                <button type="submit">সংরক্ষণ করুন</button>
+            </form>
+            <hr style="margin:20px 0;">
+            <h2>শিক্ষার্থীর তালিকা</h2>
+            <input id="search" type="text" placeholder="নাম, ক্লাস, মোবাইল বা অন্য তথ্য লিখে খুঁজুন..." onkeyup="searchStudent()" style="width:100%;padding:12px;margin:15px 0;border:1px solid #ccc;border-radius:8px;">
+            <table id="studentTable"></table>
+        </div>
+    </div>
 
-<div class="box">
-<h2>Total Students</h2>
-<h1 id="totalStudents">0</h1>
+    <div id="feeSection" class="section">
+        <div class="card">
+            <h2>💰 বেতন সংগ্রহ</h2>
+            <select id="feeStudent" style="width:100%;"><option value="">শিক্ষার্থী নির্বাচন করুন</option></select><br><br>
+            <button onclick="collectFee()" style="width:100%;">বেতন গ্রহণ করুন</button>
+        </div>
+    </div>
 </div>
 
-<div class="box">
-<h2>Total Collection</h2>
-<h1 id="totalCollection">0 ৳</h1>
-</div>
+<footer>© 2026 CONFIDENCE COACHING, PATIYA</footer>
 
-<div class="box">
-<h2>Total Due</h2>
-<h1 id="totalDue">0 ৳</h1>
-</div>
-
-</div>
-
-
-<div class="card">
-
-<h2>নতুন শিক্ষার্থী যোগ করুন</h2>
-
-<form>
-
-<input type="text" placeholder="শিক্ষার্থীর নাম"><br><br>
-
-<input type="text" placeholder="পিতার নাম"><br><br>
-
-<input type="text" placeholder="মাতার নাম"><br><br>
-
-<input type="text" placeholder="মোবাইল নম্বর"><br><br>
-
-<input type="text" placeholder="ঠিকানা"><br><br>
-
-<select>
-<option>ক্লাস নির্বাচন করুন</option>
-<option>৬ষ্ঠ</option>
-<option>৭ম</option>
-<option>৮ম</option>
-<option>৯ম</option>
-<option>১০ম</option>
-<option>একাদশ</option>
-<option>দ্বাদশ</option>
-</select>
-
-<br><br>
-
-<input type="number" placeholder="মাসিক বেতন">
-<br><br>
-
-<select id="month">
-<option value="জানুয়ারি">জানুয়ারি</option>
-<option value="ফেব্রুয়ারি">ফেব্রুয়ারি</option>
-<option value="মার্চ">মার্চ</option>
-<option value="এপ্রিল">এপ্রিল</option>
-<option value="মে">মে</option>
-<option value="জুন">জুন</option>
-<option value="জুলাই">জুলাই</option>
-<option value="আগস্ট">আগস্ট</option>
-<option value="সেপ্টেম্বর">সেপ্টেম্বর</option>
-<option value="অক্টোবর">অক্টোবর</option>
-<option value="নভেম্বর">নভেম্বর</option>
-<option value="ডিসেম্বর">ডিসেম্বর</option>
-</select>
-<br><br>
-
-<button type="submit">সংরক্ষণ করুন</button>
-
-</form>
- <h2>💰 বেতন সংগ্রহ</h2>
-
-<select id="feeStudent">
-<option value="">শিক্ষার্থী নির্বাচন করুন</option>
-</select>
-
-<br><br>
-
-<select id="feeMonth">
-<option>জানুয়ারি</option>
-<option>ফেব্রুয়ারি</option>
-<option>মার্চ</option>
-<option>এপ্রিল</option>
-<option>মে</option>
-<option>জুন</option>
-<option>জুলাই</option>
-<option>আগস্ট</option>
-<option>সেপ্টেম্বর</option>
-<option>অক্টোবর</option>
-<option>নভেম্বর</option>
-<option>ডিসেম্বর</option>
-</select>
-
-<br><br>
-
-<button onclick="collectFee()">বেতন গ্রহণ করুন</button>
-
-<hr>
-<h2>শিক্ষার্থীর তালিকা</h2>
-<input
-id="search"
-type="text"
-placeholder="শিক্ষার্থীর নাম লিখে খুঁজুন"
-onkeyup="searchStudent()"
-style="width:100%;padding:12px;margin:15px 0;border:1px solid #ccc;border-radius:8px;">
-<table id="studentTable" border="1" width="100%">
-<tr>
-<th>নাম</th>
-<th>পিতার নাম</th>
-<th>মোবাইল</th>
-<th>ক্লাস</th>
-<th>বেতন</th>
-<th>মাস</th>
-</tr>
-</table>
-</div>
-  <script>
+<script>
 let editIndex = -1;
-const form = document.querySelector("form");
+const form = document.getElementById("studentForm");
 const table = document.getElementById("studentTable");
 
-// পেজ লোড হলে শিক্ষার্থী তালিকা ও ড্রপডাউন আপডেট করা
-window.onload = () => {
-    loadStudents();
-    updateFeeDropdown();
-};
+window.onload = () => { loadStudents(); updateFeeDropdown(); };
+
+function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+}
 
 form.addEventListener("submit", function(e) {
     e.preventDefault();
     let inputs = form.querySelectorAll("input, select");
-    let name = inputs[0].value;
-    let father = inputs[1].value;
-    let mother = inputs[2].value;
-    let mobile = inputs[3].value;
-    let address = inputs[4].value;
-    let cls = inputs[5].value;
-    let fee = inputs[6].value;
-    let month = document.getElementById("month").value;
-
     let students = JSON.parse(localStorage.getItem("students")) || [];
-
-    if (editIndex == -1) {
-        students.push({ name, father, mother, mobile, address, cls, fee, month, status: "Due" });
-    } else {
-        students[editIndex] = { name, father, mother, mobile, address, cls, fee, month, status: students[editIndex].status };
-        editIndex = -1;
-    }
+    let data = { name: inputs[0].value, father: inputs[1].value, mother: inputs[2].value, mobile: inputs[3].value, address: inputs[4].value, cls: inputs[5].value, fee: inputs[6].value, month: document.getElementById("month").value, status: editIndex == -1 ? "Due" : students[editIndex].status };
+    
+    if (editIndex == -1) students.push(data);
+    else { students[editIndex] = data; editIndex = -1; }
     
     localStorage.setItem("students", JSON.stringify(students));
     form.reset();
@@ -321,92 +112,63 @@ form.addEventListener("submit", function(e) {
 function loadStudents() {
     let students = JSON.parse(localStorage.getItem("students")) || [];
     table.innerHTML = `<tr><th>নাম</th><th>পিতার নাম</th><th>মোবাইল</th><th>ক্লাস</th><th>বেতন</th><th>মাস</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr>`;
-
     students.forEach((s, index) => {
         table.innerHTML += `<tr><td>${s.name}</td><td>${s.father}</td><td>${s.mobile}</td><td>${s.cls}</td><td>${s.fee} ৳</td><td>${s.month}</td><td class="${s.status.toLowerCase()}">${s.status}</td><td><button onclick="editStudent(${index})">Edit</button> <button onclick="payFee(${index})">Paid</button> <button onclick="deleteStudent(${index})">Delete</button></td></tr>`;
     });
-
-    let totalCollection = 0;
-    let totalDue = 0;
-    students.forEach(s => {
-        if (s.status == "Paid") totalCollection += Number(s.fee);
-        else totalDue += Number(s.fee);
-    });
+    let coll = 0, due = 0;
+    students.forEach(s => s.status == "Paid" ? coll += Number(s.fee) : due += Number(s.fee));
     document.getElementById("totalStudents").innerText = students.length;
-    document.getElementById("totalCollection").innerText = totalCollection + " ৳";
-    document.getElementById("totalDue").innerText = totalDue + " ৳";
+    document.getElementById("totalCollection").innerText = coll + " ৳";
+    document.getElementById("totalDue").innerText = due + " ৳";
 }
 
-// ড্রপডাউনে শিক্ষার্থী লোড করা
 function updateFeeDropdown() {
     let students = JSON.parse(localStorage.getItem("students")) || [];
     let select = document.getElementById("feeStudent");
     select.innerHTML = '<option value="">শিক্ষার্থী নির্বাচন করুন</option>';
-    students.forEach((s, index) => {
-        select.innerHTML += `<option value="${index}">${s.name}</option>`;
-    });
+    students.forEach((s, i) => select.innerHTML += `<option value="${i}">${s.name} (${s.mobile})</option>`);
 }
 
-// বেতন গ্রহণ ফাংশন
 function collectFee() {
-    let index = document.getElementById("feeStudent").value;
-    if (index === "") { alert("শিক্ষার্থী নির্বাচন করুন!"); return; }
-    let students = JSON.parse(localStorage.getItem("students"));
-    students[index].status = "Paid";
-    localStorage.setItem("students", JSON.stringify(students));
+    let idx = document.getElementById("feeStudent").value;
+    if (idx === "") return alert("শিক্ষার্থী নির্বাচন করুন!");
+    let s = JSON.parse(localStorage.getItem("students"));
+    s[idx].status = "Paid";
+    localStorage.setItem("students", JSON.stringify(s));
     loadStudents();
-    alert("বেতন গ্রহণ সফল হয়েছে!");
+    alert("বেতন গ্রহণ সফল!");
 }
 
-// সার্চ ফাংশন (ক্র্যাশ মুক্ত)
 function searchStudent() {
-    let value = document.getElementById("search").value.toLowerCase();
-    let rows = document.querySelectorAll("#studentTable tr");
+    let val = document.getElementById("search").value.toLowerCase();
+    let rows = table.querySelectorAll("tr");
+    for (let i = 1; i < rows.length; i++) rows[i].style.display = rows[i].innerText.toLowerCase().includes(val) ? "" : "none";
+}
 
-    // টেবিলের প্রথম সারি (হেডার) বাদ দিয়ে লুপ শুরু করছি
-    for (let i = 1; i < rows.length; i++) {
-        let row = rows[i];
-        // প্রতিটি সারির ভেতরের সব কলামের টেক্সট একসাথে চেক করবে
-        let rowText = row.innerText.toLowerCase();
-
-        if (rowText.includes(value)) {
-            row.style.display = ""; 
-        } else {
-            row.style.display = "none";
-        }
-    }
-    }
-
-function editStudent(index) {
-    let s = JSON.parse(localStorage.getItem("students"))[index];
+function editStudent(i) {
+    let s = JSON.parse(localStorage.getItem("students"))[i];
     let inputs = form.querySelectorAll("input, select");
     inputs[0].value = s.name; inputs[1].value = s.father; inputs[2].value = s.mother;
     inputs[3].value = s.mobile; inputs[4].value = s.address; inputs[5].value = s.cls;
     inputs[6].value = s.fee; document.getElementById("month").value = s.month;
-    editIndex = index;
+    editIndex = i; showSection('studentsSection');
 }
 
-function payFee(index) {
-    let students = JSON.parse(localStorage.getItem("students"));
-    students[index].status = students[index].status === "Due" ? "Paid" : "Due";
-    localStorage.setItem("students", JSON.stringify(students));
+function payFee(i) {
+    let s = JSON.parse(localStorage.getItem("students"));
+    s[i].status = s[i].status === "Due" ? "Paid" : "Due";
+    localStorage.setItem("students", JSON.stringify(s));
     loadStudents();
 }
 
-function deleteStudent(index) {
+function deleteStudent(i) {
     if (confirm("মুছে ফেলতে চান?")) {
-        let students = JSON.parse(localStorage.getItem("students"));
-        students.splice(index, 1);
-        localStorage.setItem("students", JSON.stringify(students));
-        loadStudents();
-        updateFeeDropdown();
+        let s = JSON.parse(localStorage.getItem("students"));
+        s.splice(i, 1);
+        localStorage.setItem("students", JSON.stringify(s));
+        loadStudents(); updateFeeDropdown();
     }
 }
-  </script>
-  <footer>
-
-© 2026 CONFIDENCE COACHING, PATIYA
-
-  </footer>
-  </body>
+</script>
+</body>
 </html>
