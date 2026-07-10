@@ -355,6 +355,27 @@ table.innerHTML+=`
 `;
 
 });
+  let totalCollection=0;
+let totalDue=0;
+
+students.forEach(s=>{
+
+if(s.status=="Paid"){
+totalCollection+=Number(s.fee);
+
+}else{
+
+totalDue+=Number(s.fee);
+
+}
+
+});
+
+document.getElementById("totalStudents").innerText=students.length;
+
+document.getElementById("totalCollection").innerText=totalCollection+" ৳";
+
+document.getElementById("totalDue").innerText=totalDue+" ৳";
 
 }
 
