@@ -416,27 +416,6 @@ function searchStudent(){
     }
                  }
 
-let value=document.getElementById("search").value.toLowerCase();
-
-let rows=document.querySelectorAll("#studentTable tr");
-
-for(let i=1;i<rows.length;i++){
-
-let name=rows[i].cells[0].innerText.toLowerCase();
-
-if(name.indexOf(value)>-1){
-
-rows[i].style.display="";
-
-}else{
-
-rows[i].style.display="none";
-
-}
-
-}
-
-}
   function editStudent(index){
 
 let students=JSON.parse(localStorage.getItem("students"))||[];
