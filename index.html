@@ -267,7 +267,7 @@ style="width:100%;padding:12px;margin:15px 0;border:1px solid #ccc;border-radius
 </table>
 </div>
   <script>
-
+let editIndex = -1;
 const form=document.querySelector("form");
 const table=document.getElementById("studentTable");
 
@@ -285,7 +285,8 @@ let address=inputs[4].value;
 let cls=inputs[5].value;
 let fee=inputs[6].value;
 
-let students=JSON.parse(localStorage.getItem("students"))||[];
+let students=JSON.parse(localStora
+if(editIndex==-1){
 
 students.push({
 name,
@@ -298,6 +299,19 @@ fee,
 status:"Due"
 });
 
+}else{
+
+students[editIndex].name=name;
+students[editIndex].father=father;
+students[editIndex].mother=mother;
+students[editIndex].mobile=mobile;
+students[editIndex].address=address;
+students[editIndex].cls=cls;
+students[editIndex].fee=fee;
+
+editIndex=-1;
+
+}
 localStorage.setItem("students",JSON.stringify(students));
 
 form.reset();
@@ -362,11 +376,7 @@ inputs[4].value=s.address;
 inputs[5].value=s.cls;
 inputs[6].value=s.fee;
 
-students.splice(index,1);
-
-localStorage.setItem("students",JSON.stringify(students));
-
-loadStudents();
+editIndex = index;
 
 }
 
