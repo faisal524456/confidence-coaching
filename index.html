@@ -8,9 +8,8 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
         body { background:#f5f7fb; }
         header { background:#0d6efd; color:white; padding:20px; text-align:center; }
-        nav { background:#084298; display:flex; justify-content:center; flex-wrap:wrap; }
+        nav { background:#084298; display:flex; justify-content:center; }
         nav a { color:white; padding:15px; text-decoration:none; cursor:pointer; }
-        nav a:hover { background:#0d6efd; }
         .container { width:95%; margin:20px auto; }
         .card { background:white; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,.15); margin-bottom:20px; }
         .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
@@ -18,10 +17,7 @@
         table { width:100%; border-collapse:collapse; margin-top:15px; }
         th, td { border:1px solid #ddd; padding:10px; text-align:center; }
         th { background:#0d6efd; color:white; }
-        footer { margin-top:30px; background:#0d6efd; color:white; text-align:center; padding:15px; }
-        .section { display: none; }
-        .record-modal { display:none; position:fixed; top:5%; left:10%; width:80%; max-height:90%; overflow-y:auto; background:white; padding:20px; border:2px solid #0d6efd; z-index:1000; border-radius:10px; }
-        .month-btn { padding:10px; margin:5px; border:none; cursor:pointer; color:white; border-radius:5px; width:45%; display:inline-block; }
+        .record-modal { display:none; position:fixed; top:5%; left:10%; width:80%; height:80%; overflow-y:auto; background:white; padding:20px; border:2px solid #0d6efd; z-index:1000; }
     </style>
 </head>
 <body>
@@ -33,29 +29,23 @@
 </nav>
 
 <div class="container">
-    <div id="dashboardSection" class="section" style="display:block;">
+    <div id="dashboardSection" class="section">
         <div class="grid">
             <div class="box"><h2>Total Students</h2><h1 id="totalStudents">0</h1></div>
-            <div class="box"><h2>Total Collection</h2><h1 id="totalCollection">0 ৳</h1></div>
-            <div class="box"><h2>Total Due</h2><h1 id="totalDue">0 ৳</h1></div>
-        </div>
-        <div class="card" style="margin-top:20px;">
-            <button onclick="downloadPDF()">PDF রিপোর্ট ডাউনলোড</button>
+            <div class="box"><h2>Collection</h2><h1 id="totalCollection">0 ৳</h1></div>
         </div>
     </div>
 
-    <div id="studentsSection" class="section">
+    <div id="studentsSection" class="section" style="display:block;">
         <div class="card">
             <h2>শিক্ষার্থী যোগ করুন</h2>
-            <form id="studentForm" style="display:flex; flex-direction:column; gap:10px;">
-                <input type="text" id="name" placeholder="নাম" required>
-                <input type="text" id="father" placeholder="পিতার নাম" required>
-                <input type="text" id="mobile" placeholder="মোবাইল" required>
-                <input type="text" id="cls" placeholder="ক্লাস" required>
-                <input type="number" id="fee" placeholder="বেতন" required>
-                <button type="submit">সংরক্ষণ করুন</button>
+            <form id="studentForm">
+                <input type="text" id="name" placeholder="নাম" required style="width:100%; padding:10px; margin:5px 0;">
+                <input type="text" id="father" placeholder="পিতার নাম" style="width:100%; padding:10px; margin:5px 0;">
+                <input type="text" id="mobile" placeholder="মোবাইল" style="width:100%; padding:10px; margin:5px 0;">
+                <input type="number" id="fee" placeholder="বেতন" style="width:100%; padding:10px; margin:5px 0;">
+                <button type="submit" style="padding:10px; width:100%;">সংরক্ষণ</button>
             </form>
-            <input type="text" id="search" placeholder="সার্চ করুন..." onkeyup="loadTable()" style="width:100%; padding:10px; margin-top:10px;">
             <table id="studentTable"></table>
         </div>
     </div>
@@ -63,63 +53,36 @@
 
 <div id="recordPanel" class="record-modal">
     <h2 id="studentNameDisplay"></h2>
-    <input type="number" id="amountInput" placeholder="টাকার পরিমাণ..." style="width:100%; padding:10px; margin:10px 0;">
     <div id="monthGrid"></div>
-    <button onclick="document.getElementById('recordPanel').style.display='none'" style="margin-top:10px; padding:10px;">বন্ধ করুন</button>
+    <button onclick="document.getElementById('recordPanel').style.display='none'">বন্ধ করুন</button>
 </div>
-
-<footer>© 2026 CONFIDENCE COACHING, PATIYA</footer>
 
 <script>
 let students = JSON.parse(localStorage.getItem("students")) || [];
 
-function showSection(id) {
-    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-}
-
-function loadTable() {
-    let table = document.getElementById("studentTable");
-    let search = document.getElementById("search").value.toLowerCase();
-    table.innerHTML = `<tr><th>নাম</th><th>পিতার নাম</th><th>মোবাইল</th><th>অ্যাকশন</th></tr>`;
-    let totalColl = 0, totalDue = 0;
-
-    students.forEach((s, i) => {
-        if (s.name.toLowerCase().includes(search)) {
-            table.innerHTML += `<tr><td>${s.name}</td><td>${s.father}</td><td>${s.mobile}</td>
-            <td>
-                <button onclick="viewRecords(${i})">View Records</button>
-                <button onclick="deleteStudent(${i})">Delete</button>
-            </td></tr>`;
-        }
-        // হিসাব: যে মাসে পেমেন্ট আছে তা কালেকশনে যোগ হবে, না থাকলে ডিউ
-        for(let m in s.monthsData) {
-            totalColl += Number(s.monthsData[m].amount);
-        }
+function updateDashboard() {
+    let totalColl = 0;
+    students.forEach(s => {
+        for(let m in s.monthsData) totalColl += Number(s.monthsData[m].amount);
     });
     document.getElementById("totalStudents").innerText = students.length;
     document.getElementById("totalCollection").innerText = totalColl + " ৳";
 }
 
-function viewRecords(index) {
-    let s = students[index];
-    document.getElementById("studentNameDisplay").innerText = "রেকর্ড: " + s.name;
-    let grid = document.getElementById("monthGrid");
-    grid.innerHTML = "";
-    ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"].forEach(m => {
-        let data = (s.monthsData && s.monthsData[m]) ? s.monthsData[m] : {status: "Due", amount: 0};
-        grid.innerHTML += `<button class="month-btn" style="background:${data.status=='Paid'?'green':'red'}" onclick="setPayment('${m}', ${index})">${m} (${data.amount}৳)</button>`;
-    });
-    document.getElementById("recordPanel").style.display = "block";
+function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+    if(id === 'dashboardSection') updateDashboard();
 }
 
-function setPayment(month, index) {
-    let amount = document.getElementById("amountInput").value;
-    if(!amount) { alert("টাকা লিখুন!"); return; }
-    if(!students[index].monthsData) students[index].monthsData = {};
-    students[index].monthsData[month] = { status: "Paid", amount: amount };
-    localStorage.setItem("students", JSON.stringify(students));
-    viewRecords(index); loadTable();
+function loadTable() {
+    let table = document.getElementById("studentTable");
+    table.innerHTML = `<tr><th>নাম</th><th>পিতা</th><th>মোবাইল</th><th>অ্যাকশন</th></tr>`;
+    students.forEach((s, i) => {
+        table.innerHTML += `<tr><td>${s.name}</td><td>${s.father}</td><td>${s.mobile}</td>
+        <td><button onclick="viewRecords(${i})">Records</button><button onclick="deleteStudent(${i})">Del</button></td></tr>`;
+    });
+    updateDashboard();
 }
 
 document.getElementById("studentForm").addEventListener("submit", (e) => {
@@ -132,11 +95,31 @@ document.getElementById("studentForm").addEventListener("submit", (e) => {
         monthsData: {}
     });
     localStorage.setItem("students", JSON.stringify(students));
-    e.target.reset(); loadTable();
+    e.target.reset();
+    loadTable();
 });
 
+function viewRecords(index) {
+    currentStudentIndex = index;
+    let s = students[index];
+    document.getElementById("studentNameDisplay").innerText = s.name;
+    let grid = document.getElementById("monthGrid");
+    grid.innerHTML = "";
+    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].forEach(m => {
+        let val = s.monthsData[m] ? s.monthsData[m].amount : 0;
+        grid.innerHTML += `<div>${m}: <input type="number" value="${val}" onchange="savePayment('${m}', this.value)"> ৳</div>`;
+    });
+    document.getElementById("recordPanel").style.display = "block";
+}
+
+function savePayment(month, amount) {
+    if(!students[currentStudentIndex].monthsData) students[currentStudentIndex].monthsData = {};
+    students[currentStudentIndex].monthsData[month] = { amount: amount };
+    localStorage.setItem("students", JSON.stringify(students));
+    updateDashboard();
+}
+
 function deleteStudent(i) { students.splice(i, 1); localStorage.setItem("students", JSON.stringify(students)); loadTable(); }
-function downloadPDF() { html2pdf().from(document.body).save('Confidence_Report.pdf'); }
 
 window.onload = loadTable;
 </script>
