@@ -362,11 +362,20 @@ function collectFee() {
 function searchStudent() {
     let value = document.getElementById("search").value.toLowerCase();
     let rows = document.querySelectorAll("#studentTable tr");
+
+    // টেবিলের প্রথম সারি (হেডার) বাদ দিয়ে লুপ শুরু করছি
     for (let i = 1; i < rows.length; i++) {
-        let name = rows[i].cells[0].innerText.toLowerCase();
-        rows[i].style.display = name.includes(value) ? "" : "none";
+        let row = rows[i];
+        // প্রতিটি সারির ভেতরের সব কলামের টেক্সট একসাথে চেক করবে
+        let rowText = row.innerText.toLowerCase();
+
+        if (rowText.includes(value)) {
+            row.style.display = ""; 
+        } else {
+            row.style.display = "none";
+        }
     }
-}
+    }
 
 function editStudent(index) {
     let s = JSON.parse(localStorage.getItem("students"))[index];
