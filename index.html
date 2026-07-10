@@ -428,23 +428,28 @@ document.getElementById("totalDue").innerText=totalDue+" ৳";
 
 loadStudents();
 function searchStudent(){
-let students=JSON.parse(localStorage.getItem("students"))||[];
 
-let s=students[index];
+let value=document.getElementById("search").value.toLowerCase();
 
-let inputs=form.querySelectorAll("input,select");
+let rows=document.querySelectorAll("#studentTable tr");
 
-inputs[0].value=s.name;
-inputs[1].value=s.father;
-inputs[2].value=s.mother;
-inputs[3].value=s.mobile;
-inputs[4].value=s.address;
-inputs[5].value=s.cls;
-inputs[6].value=s.fee;
+for(let i=1;i<rows.length;i++){
 
-editIndex = index;
+let name=rows[i].cells[0].innerText.toLowerCase();
+
+if(name.indexOf(value)>-1){
+
+rows[i].style.display="";
+
+}else{
+
+rows[i].style.display="none";
 
 }
+
+}
+
+  }
 
 let value=document.getElementById("search").value.toLowerCase();
 
