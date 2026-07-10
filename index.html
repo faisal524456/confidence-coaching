@@ -243,7 +243,22 @@ background:#084298;
 <br><br>
 
 <input type="number" placeholder="মাসিক বেতন">
+<br><br>
 
+<select id="month">
+<option value="জানুয়ারি">জানুয়ারি</option>
+<option value="ফেব্রুয়ারি">ফেব্রুয়ারি</option>
+<option value="মার্চ">মার্চ</option>
+<option value="এপ্রিল">এপ্রিল</option>
+<option value="মে">মে</option>
+<option value="জুন">জুন</option>
+<option value="জুলাই">জুলাই</option>
+<option value="আগস্ট">আগস্ট</option>
+<option value="সেপ্টেম্বর">সেপ্টেম্বর</option>
+<option value="অক্টোবর">অক্টোবর</option>
+<option value="নভেম্বর">নভেম্বর</option>
+<option value="ডিসেম্বর">ডিসেম্বর</option>
+</select>
 <br><br>
 
 <button type="submit">সংরক্ষণ করুন</button>
@@ -284,7 +299,7 @@ let mobile=inputs[3].value;
 let address=inputs[4].value;
 let cls=inputs[5].value;
 let fee=inputs[6].value;
-
+let month=document.getElementById("month").value;
 let students=JSON.parse(localStorage.getItem("students"))||[];
 if(editIndex==-1){
 
@@ -296,6 +311,7 @@ mobile,
 address,
 cls,
 fee,
+month,
 status:"Due"
 });
 
