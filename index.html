@@ -264,6 +264,34 @@ background:#084298;
 <button type="submit">সংরক্ষণ করুন</button>
 
 </form>
+ <h2>💰 বেতন সংগ্রহ</h2>
+
+<select id="feeStudent">
+<option value="">শিক্ষার্থী নির্বাচন করুন</option>
+</select>
+
+<br><br>
+
+<select id="feeMonth">
+<option>জানুয়ারি</option>
+<option>ফেব্রুয়ারি</option>
+<option>মার্চ</option>
+<option>এপ্রিল</option>
+<option>মে</option>
+<option>জুন</option>
+<option>জুলাই</option>
+<option>আগস্ট</option>
+<option>সেপ্টেম্বর</option>
+<option>অক্টোবর</option>
+<option>নভেম্বর</option>
+<option>ডিসেম্বর</option>
+</select>
+
+<br><br>
+
+<button onclick="collectFee()">বেতন গ্রহণ করুন</button>
+
+<hr>
 <h2>শিক্ষার্থীর তালিকা</h2>
 <input
 id="search"
@@ -348,6 +376,7 @@ table.innerHTML=`
 <th>মোবাইল</th>
 <th>ক্লাস</th>
 <th>বেতন</th>
+<th>মাস</th>
 <th>স্ট্যাটাস</th>
 <th>অ্যাকশন</th>
 </tr>
@@ -399,8 +428,6 @@ document.getElementById("totalDue").innerText=totalDue+" ৳";
 
 loadStudents();
 function searchStudent(){
-function editStudent(index){
-
 let students=JSON.parse(localStorage.getItem("students"))||[];
 
 let s=students[index];
@@ -440,6 +467,25 @@ rows[i].style.display="none";
 }
 
 }
+  function editStudent(index){
+
+let students=JSON.parse(localStorage.getItem("students"))||[];
+
+let s=students[index];
+
+let inputs=form.querySelectorAll("input,select");
+
+inputs[0].value=s.name;
+inputs[1].value=s.father;
+inputs[2].value=s.mother;
+inputs[3].value=s.mobile;
+inputs[4].value=s.address;
+inputs[5].value=s.cls;
+inputs[6].value=s.fee;
+
+editIndex=index;
+
+  }
  function payFee(index){
 
 let students=JSON.parse(localStorage.getItem("students"))||[];
